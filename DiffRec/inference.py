@@ -105,12 +105,12 @@ valid_path = args.data_path + 'valid_list.npy'
 test_path = args.data_path + 'test_list.npy'
 
 train_data, valid_y_data, test_y_data, n_user, n_item = data_utils.data_load(train_path, valid_path, test_path)
-train_dataset = data_utils.DataDiffusion(torch.FloatTensor(train_data.A))
+train_dataset = data_utils.DataDiffusion(torch.FloatTensor(train_data.toarray()))
 train_loader = DataLoader(train_dataset, batch_size=args.batch_size, pin_memory=True, shuffle=True, num_workers=4, worker_init_fn=worker_init_fn)
 test_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=False)
 
 if args.tst_w_val:
-    tv_dataset = data_utils.DataDiffusion(torch.FloatTensor(train_data.A) + torch.FloatTensor(valid_y_data.A))
+    tv_dataset = data_utils.DataDiffusion(torch.FloatTensor(train_data.toarray()) + torch.FloatTensor(valid_y_data.toarray()))
     test_twv_loader = DataLoader(tv_dataset, batch_size=args.batch_size, shuffle=False)
 mask_tv = train_data + valid_y_data
 
@@ -145,7 +145,7 @@ elif args.dataset == "ml-1m_noisy":
     model_name = "ml-1m_noisy_lr0.001_wd0.0_bs400_dims[200,600]_emb10_x0_steps5_scale0.5_min0.001_max0.01_sample0_reweight0_log.pth"
 
 
-model = torch.load(model_path + model_name).to(device)
+model = torch.load(model_path + model_name, map_location=device, weights_only=False).to(device)
 
 print("models ready.")
 
